@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#CC1111"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<link rel="manifest" href='data:application/manifest+json,{"name":"KBAKA دفتر الحسابات","short_name":"KBAKA","display":"standalone","background_color":"#CC1111","theme_color":"#CC1111","start_url":".","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%23CC1111%27/%3E%3Ctext y=%270.85em%27 font-size=%2775%27 font-family=%27Georgia,serif%27 font-weight=%27bold%27 font-style=%27italic%27 fill=%27white%27 x=%2717%27%3EK%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'/>
+<title>KBAKA | دفتر الحسابات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#CC1111;--red-dark:#990C0C;--red-deep:#6B0808;
+  --red-light:#FDEAEA;--red-mid:#F5C0C0;
+  --green:#15803d;--green-light:#dcfce7;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --white:#fff;--bg:#F7F7F7;
+  --card:#fff;--border:#E8E8E8;
+  --txt:#1A1A1A;--txt2:#666;--txt3:#AAA;
+  --r:12px;--rs:8px;--rxs:6px
+}
+body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+.app{max-width:680px;margin:0 auto;padding-bottom:5.5rem;min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:var(--red);padding:0 14px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.logo-box{display:flex;align-items:center;gap:10px}
+.logo-k{width:34px;height:34px;background:var(--white);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:900;color:var(--red);font-style:italic;flex-shrink:0}
+.logo-txt{line-height:1.2}
+.logo-name{font-size:15px;font-weight:800;color:var(--white);letter-spacing:.5px}
+.logo-tag{font-size:9px;color:rgba(255,255,255,.72);letter-spacing:.3px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.sync-box{display:flex;align-items:center;gap:5px}
+.sync-lbl{font-size:10px;color:rgba(255,255,255,.8)}
+.dot{width:8px;height:8px;border-radius:50%;background:#4ade80;flex-shrink:0;transition:background .3s}
+.dot.syncing{background:#fbbf24;animation:pulse 1s infinite}
+.dot.offline{background:#f87171}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.gear-btn{background:rgba(255,255,255,.15);border:none;color:white;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* TABS */
+.tabs{display:flex;background:var(--red-dark)}
+.tab{flex:1;padding:12px 8px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:rgba(255,255,255,.55);border-bottom:3px solid transparent;transition:.2s;user-select:none;font-family:'Cairo',sans-serif}
+.tab.active{color:var(--white);border-bottom-color:var(--white)}
+
+/* SUMMARY */
+.summary-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:13px 14px;text-align:center;border-top:3px solid var(--red)}
+.stat-lbl{font-size:11px;color:var(--txt2);margin-bottom:5px;font-weight:600}
+.stat-val{font-size:21px;font-weight:800;color:var(--txt)}
+.stat-val.r{color:var(--red)}
+
+/* SEARCH */
+.search-wrap{padding:0 14px 8px;position:relative;display:flex;align-items:center}
+.search-ico{position:absolute;right:25px;color:var(--txt3);font-size:16px;pointer-events:none}
+.search-inp{width:100%;padding:10px 38px 10px 13px;border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-family:'Cairo',sans-serif;background:var(--card);color:var(--txt);direction:rtl;transition:.2s}
+.search-inp:focus{outline:none;border-color:var(--red)}
+
+/* LIST */
+.list-wrap{padding:0 14px}
+.person-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;cursor:pointer;transition:border-color .15s,box-shadow .15s;overflow:hidden}
+.person-card:hover{border-color:var(--red-mid);box-shadow:0 2px 10px rgba(204,17,17,.1)}
+.card-top{height:3px;background:var(--red)}
+.p-row{display:flex;align-items:center;gap:12px;padding:13px 14px}
+.avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;border:2px solid var(--red-mid)}
+.avatar.client{background:var(--red-light);color:var(--red-deep)}
+.avatar.supplier{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+.p-info{flex:1;min-width:0}
+.p-name{font-size:15px;font-weight:700;color:var(--txt)}
+.p-meta{font-size:12px;color:var(--txt3);margin-top:2px}
+.pill{font-size:13px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.pill-r{background:var(--red-light);color:var(--red)}
+.pill-g{background:var(--green-light);color:var(--green)}
+.pill-n{background:var(--bg);color:var(--txt3)}
+
+/* FAB */
+.fab{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--red);color:var(--white);border:none;border-radius:28px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;box-shadow:0 4px 20px rgba(204,17,17,.45);font-family:'Cairo',sans-serif;transition:.15s;z-index:40}
+.fab:active{transform:translateX(-50%) scale(.96)}
+
+/* DETAIL */
+.detail-header{background:var(--red);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.back-btn{background:rgba(255,255,255,.15);border:none;cursor:pointer;color:var(--white);width:36px;height:36px;border-radius:var(--rxs);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;font-family:'Cairo',sans-serif}
+.d-name{font-size:17px;font-weight:800;color:var(--white)}
+.d-type{font-size:12px;color:rgba(255,255,255,.7);margin-top:1px}
+.d-actions{margin-right:auto;display:flex;gap:8px}
+.btn-sm{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;color:var(--white);font-family:'Cairo',sans-serif;white-space:nowrap;transition:.15s}
+.btn-sm:hover{background:rgba(255,255,255,.25)}
+.btn-sm.danger{border-color:rgba(255,255,255,.3)}
+
+.balance-hero{margin:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;border-top:4px solid var(--red)}
+.bh-lbl{font-size:13px;color:var(--txt2);margin-bottom:8px;font-weight:600}
+.bh-amt{font-size:36px;font-weight:800;letter-spacing:-1px}
+.bh-amt.r{color:var(--red)}
+.bh-amt.g{color:var(--green)}
+.bh-amt.n{color:var(--txt3)}
+
+.tx-hdr{padding:6px 14px 4px;display:flex;align-items:center;justify-content:space-between}
+.tx-hdr-lbl{font-size:12px;font-weight:700;color:var(--txt3);letter-spacing:.5px}
+.tx-item{display:flex;align-items:flex-start;gap:11px;padding:13px 14px;border-bottom:1px solid var(--border);background:var(--card)}
+.tx-item:last-child{border-bottom:none}
+.tx-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:1px}
+.tx-ico.debt{background:var(--red-light)}
+.tx-ico.credit{background:#fef3c7}
+.tx-ico.payment{background:var(--green-light)}
+.tx-body{flex:1;min-width:0}
+.tx-desc{font-size:14px;font-weight:700;color:var(--txt)}
+.tx-date{font-size:11px;color:var(--txt3);margin-top:2px}
+.tx-user{font-size:11px;color:var(--txt3)}
+.tx-rem{font-size:11px;color:var(--red);font-weight:700;margin-top:4px;background:var(--red-light);display:inline-block;padding:2px 9px;border-radius:10px}
+.tx-amt{font-size:14px;font-weight:800;white-space:nowrap;padding-top:2px;flex-shrink:0}
+.tx-amt.r{color:var(--red)}
+.tx-amt.g{color:var(--green)}
+.tx-action-btns{display:flex;gap:2px;margin-top:4px}
+.tx-action-btn{font-size:10px;background:none;border:none;color:var(--txt3);cursor:pointer;font-family:'Cairo',sans-serif;padding:3px 6px;border-radius:4px;transition:.15s}
+.tx-action-btn:hover{background:var(--bg);color:var(--txt2)}
+
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;padding-bottom:28px}
+.drag-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0}
+.modal-head{background:var(--red);padding:14px 20px;margin-top:10px}
+.modal-title{font-size:16px;font-weight:800;color:var(--white)}
+.modal-body{padding:18px 20px 0}
+.form-lbl{font-size:13px;font-weight:700;color:var(--txt2);margin-bottom:6px;display:block}
+.form-inp,.form-sel{width:100%;padding:12px 13px;border:1px solid var(--border);border-radius:var(--rxs);font-size:15px;font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);direction:rtl;margin-bottom:14px;transition:.2s}
+.form-inp:focus,.form-sel:focus{outline:none;border-color:var(--red);background:var(--white)}
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.type-btn{padding:12px;text-align:center;border:2px solid var(--border);border-radius:var(--rs);cursor:pointer;font-size:14px;font-weight:700;background:var(--bg);color:var(--txt3);transition:.15s;font-family:'Cairo',sans-serif}
+.type-btn.sc{background:var(--red-light);color:var(--red);border-color:var(--red)}
+.type-btn.ss{background:#fef3c7;color:#92400e;border-color:#f59e0b}
+.tx-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.tx-btn{padding:11px 6px;text-align:center;border:2px solid var(--border);border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:700;background:var(--bg);color:var(--txt3);transition:.15s;font-family:'Cairo',sans-serif;line-height:1.4}
+.tx-btn.sd{background:var(--red-light);color:var(--red);border-color:var(--red)}
+.tx-btn.sp{background:var(--green-light);color:var(--green);border-color:var(--green)}
+.tx-btn.sc2{background:#fef3c7;color:#92400e;border-color:#f59e0b}
+.submit-btn{width:100%;padding:14px;background:var(--red);color:var(--white);border:none;border-radius:var(--rs);font-size:16px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;margin-top:4px;transition:.15s;letter-spacing:.3px}
+.submit-btn:active{transform:scale(.99)}
+.submit-btn.danger-btn{background:#dc2626}
+.cancel-btn{width:100%;padding:12px;background:var(--bg);color:var(--txt2);border:1px solid var(--border);border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;margin-top:8px}
+.form-hint{font-size:11px;color:var(--txt3);margin-top:-10px;margin-bottom:14px;line-height:1.6}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px}
+.empty-ico{font-size:46px;margin-bottom:14px;opacity:.45}
+.empty-txt{font-size:16px;font-weight:700;color:var(--txt2);margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--txt3)}
+
+/* TOAST */
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:22px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;border-right:3px solid var(--red);font-family:'Cairo',sans-serif}
+.toast.show{opacity:1}
+
+/* SETUP SCREEN */
+.setup-screen{position:fixed;inset:0;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;padding:24px;overflow-y:auto}
+.us-logo{width:64px;height:64px;background:var(--white);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;color:var(--red);font-style:italic;margin:0 auto 14px}
+.us-title{font-size:22px;font-weight:800;color:var(--white);margin-bottom:4px;text-align:center}
+.us-sub{font-size:13px;color:rgba(255,255,255,.75);margin-bottom:24px;text-align:center;line-height:1.6}
+.us-form{width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:0}
+.us-label{width:100%;font-size:12px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:5px;text-align:right}
+.us-inp{width:100%;padding:14px 16px;border:2px solid rgba(255,255,255,.3);border-radius:var(--rs);font-size:15px;font-family:'Cairo',sans-serif;background:rgba(255,255,255,.12);color:var(--white);direction:rtl;margin-bottom:12px;text-align:right}
+.us-inp::placeholder{color:rgba(255,255,255,.45)}
+.us-inp:focus{outline:none;border-color:var(--white)}
+.us-inp.ltr{direction:ltr;text-align:left;font-size:12px}
+.us-btn{width:100%;padding:14px;background:var(--white);color:var(--red);border:none;border-radius:var(--rs);font-size:16px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;margin-top:4px}
+.us-help-toggle{background:none;border:1px solid rgba(255,255,255,.35);color:rgba(255,255,255,.8);font-size:12px;font-family:'Cairo',sans-serif;padding:8px 16px;border-radius:20px;cursor:pointer;margin-top:12px}
+.us-help{background:rgba(0,0,0,.2);border-radius:var(--rs);padding:16px;margin-top:12px;width:100%;max-width:340px;display:none}
+.us-help.open{display:block}
+.us-help ol{color:rgba(255,255,255,.85);font-size:12px;padding-right:18px;line-height:2;direction:rtl;text-align:right}
+.us-help li{margin-bottom:2px}
+.us-help a{color:#fff;font-weight:700}
+
+/* CONFIRM DIALOG */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--white);border-radius:var(--r);padding:24px;max-width:320px;width:100%;text-align:center}
+.confirm-icon{font-size:36px;margin-bottom:12px}
+.confirm-title{font-size:17px;font-weight:800;color:var(--txt);margin-bottom:8px}
+.confirm-msg{font-size:14px;color:var(--txt2);margin-bottom:20px;line-height:1.6}
+.confirm-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.c-cancel{padding:12px;border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--txt2);font-family:'Cairo',sans-serif}
+.c-ok{padding:12px;border:none;border-radius:var(--rs);font-size:14px;font-weight:700;cursor:pointer;background:#dc2626;color:var(--white);font-family:'Cairo',sans-serif}
+
+/* EDIT TX BADGE */
+.edit-badge{display:inline-block;font-size:10px;background:var(--amber-light);color:var(--amber);border-radius:4px;padding:1px 5px;margin-right:4px;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<!-- ====== SETUP SCREEN ====== -->
+<div class="setup-screen" id="setup-screen">
+  <div class="us-logo">K</div>
+  <div class="us-title">أهلاً في KBAKA</div>
+  <div class="us-sub">دفتر الحسابات المحلي<br>البيانات بتُحفظ في Google Sheets على Drive بتاعتك</div>
+  <div class="us-form">
+    <div class="us-label">اسمك (هيظهر مع كل معاملة)</div>
+    <input class="us-inp" id="us-name" type="text" placeholder="اسمك هنا..." maxlength="20"/>
+    <div class="us-label">رابط Google Apps Script <span style="font-weight:400;opacity:.7">(اختياري)</span></div>
+    <input class="us-inp ltr" id="us-script" type="url" placeholder="https://script.google.com/macros/s/.../exec"/>
+    <div style="width:100%;font-size:11px;color:rgba(255,255,255,.6);margin-top:-8px;margin-bottom:14px;text-align:right;line-height:1.7">
+      بدون الرابط: البيانات بتُحفظ محلياً على الجهاز فقط
+    </div>
+    <button class="us-btn" onclick="saveUser()">ابدأ ➜</button>
+  </div>
+  <button class="us-help-toggle" onclick="toggleHelp()">❓ إزاي أعمل الرابط؟</button>
+  <div class="us-help" id="us-help">
+    <ol>
+      <li>افتح <a href="https://sheets.new" target="_blank">sheets.new</a> وعمل شيت جديد</li>
+      <li>من القائمة: <strong>Extensions → Apps Script</strong></li>
+      <li>احذف الكود الموجود والصق كود الـ <strong>kbaka_script.gs</strong></li>
+      <li>اضغط <strong>Deploy → New deployment</strong></li>
+      <li>نوع الـ Deploy: <strong>Web app</strong></li>
+      <li>Execute as: <strong>Me</strong> — Access: <strong>Anyone</strong></li>
+      <li>اضغط Deploy وانسخ الـ URL والصقه هنا</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ====== MAIN APP ====== -->
+<div class="app" id="app" style="display:none">
+
+<div class="topbar">
+  <div class="logo-box">
+    <div class="logo-k">K</div>
+    <div class="logo-txt">
+      <div class="logo-name">KBAKA</div>
+      <div class="logo-tag">دفتر الحسابات</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="sync-box">
+      <span class="sync-lbl" id="sync-lbl">جارٍ التحميل...</span>
+      <span class="dot syncing" id="sync-dot"></span>
+    </div>
+    <button class="gear-btn" onclick="openSettings()">⚙️</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="tab-clients" onclick="switchTab('clients')">👤 العملاء <span id="c-cnt"></span></div>
+  <div class="tab" id="tab-suppliers" onclick="switchTab('suppliers')">🏪 الموردين <span id="s-cnt"></span></div>
+</div>
+
+<!-- LIST VIEW -->
+<div id="view-list">
+  <div class="summary-bar" id="summary-bar"></div>
+  <div class="search-wrap">
+    <span class="search-ico">🔍</span>
+    <input class="search-inp" id="search-inp" type="text" placeholder="ابحث باسم الشخص..." oninput="filterList(this.value)"/>
+  </div>
+  <div class="list-wrap" id="list-container"></div>
+</div>
+
+<!-- DETAIL VIEW -->
+<div id="view-detail" style="display:none">
+  <div class="detail-header">
+    <button class="back-btn" onclick="backToList()">→</button>
+    <div>
+      <div class="d-name" id="d-name"></div>
+      <div class="d-type" id="d-type"></div>
+    </div>
+    <div class="d-actions">
+      <button class="btn-sm" onclick="openEditPersonModal()">✏️ تعديل</button>
+      <button class="btn-sm danger" onclick="confirmDeletePerson()">🗑</button>
+    </div>
+  </div>
+  <div class="balance-hero">
+    <div class="bh-lbl" id="bh-lbl"></div>
+    <div class="bh-amt" id="bh-amt"></div>
+  </div>
+  <div style="padding:0 14px 10px">
+    <button onclick="openTxModal()" style="width:100%;padding:13px;background:var(--red);color:var(--white);border:none;border-radius:var(--rs);font-size:15px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif">+ تسجيل معاملة جديدة</button>
+  </div>
+  <div class="tx-hdr">
+    <span class="tx-hdr-lbl">سجل المعاملات</span>
+    <span style="font-size:11px;color:var(--txt3)" id="tx-cnt-lbl"></span>
+  </div>
+  <div id="tx-list"></div>
+</div>
+
+</div><!-- end app -->
+
+<button class="fab" id="main-fab" onclick="openPersonModal()" style="display:none">+ إضافة شخص جديد</button>
+
+<!-- ====== ADD/EDIT PERSON MODAL ====== -->
+<div class="overlay" id="modal-person" onclick="maybeClose('modal-person',event)">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="drag-handle"></div>
+  <div class="modal-head"><div class="modal-title" id="person-modal-title">إضافة شخص جديد</div></div>
+  <div class="modal-body">
+    <div class="type-toggle" id="person-type-toggle">
+      <button class="type-btn sc" id="ptype-client" onclick="setPersonType('client')">👤 عميل</button>
+      <button class="type-btn" id="ptype-supplier" onclick="setPersonType('supplier')">🏪 مورد</button>
+    </div>
+    <label class="form-lbl">الاسم *</label>
+    <input class="form-inp" id="p-name" type="text" placeholder="اسم العميل أو المورد" maxlength="40"/>
+    <label class="form-lbl">رقم الهاتف (اختياري)</label>
+    <input class="form-inp" id="p-phone" type="tel" placeholder="01xxxxxxxxx" maxlength="15"/>
+    <label class="form-lbl">ملاحظة (اختياري)</label>
+    <input class="form-inp" id="p-note" type="text" placeholder="مثلاً: عميل منتظم..." maxlength="80"/>
+    <button class="submit-btn" id="person-save-btn" onclick="savePerson()">✓ حفظ</button>
+    <button class="cancel-btn" onclick="closeM('modal-person')">إلغاء</button>
+  </div>
+</div>
+</div>
+
+<!-- ====== TX MODAL ====== -->
+<div class="overlay" id="modal-tx" onclick="maybeClose('modal-tx',event)">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="drag-handle"></div>
+  <div class="modal-head"><div class="modal-title" id="tx-modal-title">تسجيل معاملة</div></div>
+  <div class="modal-body">
+    <div class="tx-grid" id="tx-type-grid"></div>
+    <label class="form-lbl">المبلغ (جنيه) *</label>
+    <input class="form-inp" id="tx-amount" type="number" placeholder="0.00" min="0" step="0.5"/>
+    <label class="form-lbl">البيان</label>
+    <input class="form-inp" id="tx-desc" type="text" placeholder="مثلاً: بضاعة، دفعة، فاتورة..." maxlength="80"/>
+    <button class="submit-btn" onclick="saveTx()">✓ تسجيل المعاملة</button>
+    <button class="cancel-btn" onclick="closeM('modal-tx')">إلغاء</button>
+  </div>
+</div>
+</div>
+
+<!-- ====== EDIT TX MODAL (NEW) ====== -->
+<div class="overlay" id="modal-edit-tx" onclick="maybeClose('modal-edit-tx',event)">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="drag-handle"></div>
+  <div class="modal-head"><div class="modal-title" id="edit-tx-title">✏️ تعديل المعاملة</div></div>
+  <div class="modal-body">
+    <div id="edit-tx-type-badge" style="margin-bottom:14px"></div>
+    <label class="form-lbl">المبلغ الجديد (جنيه) *</label>
+    <input class="form-inp" id="edit-tx-amount" type="number" placeholder="0.00" min="0" step="0.5"/>
+    <label class="form-lbl">البيان</label>
+    <input class="form-inp" id="edit-tx-desc" type="text" placeholder="وصف المعاملة..." maxlength="80"/>
+    <div class="form-hint">⚠️ تعديل المبلغ هيُعيد حساب المتبقي على كل المعاملات تلقائياً</div>
+    <button class="submit-btn" onclick="saveEditTx()">✓ حفظ التعديل</button>
+    <button class="cancel-btn" onclick="closeM('modal-edit-tx')">إلغاء</button>
+  </div>
+</div>
+</div>
+
+<!-- ====== SETTINGS MODAL ====== -->
+<div class="overlay" id="modal-settings" onclick="maybeClose('modal-settings',event)">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="drag-handle"></div>
+  <div class="modal-head"><div class="modal-title">⚙️ الإعدادات</div></div>
+  <div class="modal-body">
+    <label class="form-lbl">اسمك</label>
+    <input class="form-inp" id="s-name" type="text" maxlength="20"/>
+    <label class="form-lbl">رابط Google Apps Script</label>
+    <input class="form-inp" id="s-script" type="url" style="direction:ltr;font-size:12px;text-align:left" placeholder="https://script.google.com/macros/s/.../exec"/>
+    <div class="form-hint">اترك الرابط فارغاً للحفظ المحلي فقط على الجهاز</div>
+    <button class="submit-btn" onclick="saveSettings()">✓ حفظ الإعدادات</button>
+    <hr style="margin:16px 0;border:none;border-top:1px solid var(--border)"/>
+    <button class="submit-btn danger-btn" onclick="confirmResetApp()">🗑 مسح جميع البيانات المحلية</button>
+    <button class="cancel-btn" onclick="closeM('modal-settings')">إلغاء</button>
+  </div>
+</div>
+</div>
+
+<!-- ====== CONFIRM DIALOG ====== -->
+<div class="confirm-overlay" id="confirm-overlay">
+<div class="confirm-box">
+  <div class="confirm-icon" id="confirm-icon">⚠️</div>
+  <div class="confirm-title" id="confirm-title"></div>
+  <div class="confirm-msg" id="confirm-msg"></div>
+  <div class="confirm-btns">
+    <button class="c-cancel" onclick="closeConfirm()">إلغاء</button>
+    <button class="c-ok" id="confirm-ok">تأكيد</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let scriptUrl = localStorage.getItem('kbaka_script') || '';
+let currentUser = localStorage.getItem('kbaka_user') || null;
+let S = { people: [], transactions: [] };
+let currentTab = 'clients';
+let currentPersonId = null;
+let editingPersonId = null;
+let editingTxId = null;
+let pType = 'client';
+let txType = 'debt';
+let searchQ = '';
+let confirmCallback = null;
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load', () => {
+  if (currentUser) {
+    startApp();
+  }
+  document.getElementById('us-name').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('us-script').focus(); });
+  document.getElementById('us-script').addEventListener('keydown', e => { if (e.key === 'Enter') saveUser(); });
+});
+
+function toggleHelp() {
+  const el = document.getElementById('us-help');
+  el.classList.toggle('open');
+}
+
+function saveUser() {
+  const name = document.getElementById('us-name').value.trim();
+  if (!name) { alert('اكتب اسمك أولاً'); return; }
+  scriptUrl = document.getElementById('us-script').value.trim();
+  localStorage.setItem('kbaka_user', name);
+  localStorage.setItem('kbaka_script', scriptUrl);
+  currentUser = name;
+  startApp();
+}
+
+function startApp() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('main-fab').style.display = 'flex';
+  initStorage();
+}
+
+// ============================================================
+// STORAGE — Google Apps Script OR localStorage
+// ============================================================
+async function initStorage() {
+  setSyncState('syncing');
+  if (scriptUrl) {
+    try {
+      const res = await fetch(scriptUrl + '?nocache=' + Date.now());
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (data && Array.isArray(data.people)) {
+        S.people = data.people.map(p => ({
+          id: String(p.id || uid()), type: String(p.type || 'client'),
+          name: String(p.name || ''), phone: String(p.phone || ''),
+          note: String(p.note || ''), ts: Number(p.ts) || Date.now()
+        }));
+        S.transactions = (data.transactions || []).map(t => ({
+          id: String(t.id || uid()), pid: String(t.pid || ''),
+          type: String(t.type || 'debt'), amount: Number(t.amount) || 0,
+          desc: String(t.desc || ''), date: Number(t.date) || Date.now(),
+          user: String(t.user || ''), rem: Number(t.rem) || 0
+        }));
+        saveLocal();
+        setSyncState('ok');
+      } else {
+        loadLocal();
+        setSyncState('local');
+      }
+    } catch (e) {
+      console.warn('Script fetch failed, using local:', e.message);
+      loadLocal();
+      setSyncState('offline');
+    }
+  } else {
+    loadLocal();
+    setSyncState('local');
+  }
+  render();
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem('kbaka_data');
+    if (raw) { const d = JSON.parse(raw); S.people = d.people || []; S.transactions = d.transactions || []; }
+    else { S = { people: [], transactions: [] }; }
+  } catch (e) { S = { people: [], transactions: [] }; }
+}
+
+function saveLocal() {
+  try { localStorage.setItem('kbaka_data', JSON.stringify(S)); } catch (e) {}
+}
+
+async function persist() {
+  saveLocal();
+  if (!scriptUrl) { setSyncState('local'); return; }
+  setSyncState('syncing');
+  try {
+    // Use text/plain to avoid CORS preflight
+    await fetch(scriptUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'save_all', people: S.people, transactions: S.transactions })
+    });
+    setSyncState('ok');
+  } catch (e) {
+    setSyncState('offline');
+  }
+}
+
+function setSyncState(s) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-lbl');
+  const map = {
+    ok:      { bg: '#4ade80', txt: scriptUrl ? 'Drive ✓' : 'محفوظ', anim: false },
+    syncing: { bg: '#fbbf24', txt: 'جارٍ الحفظ...', anim: true },
+    offline: { bg: '#f87171', txt: 'غير متصل', anim: false },
+    local:   { bg: '#60a5fa', txt: 'محلي فقط', anim: false }
+  };
+  const st = map[s] || map.ok;
+  dot.style.background = st.bg;
+  dot.className = 'dot' + (st.anim ? ' syncing' : '');
+  lbl.textContent = st.txt;
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function openSettings() {
+  document.getElementById('s-name').value = currentUser || '';
+  document.getElementById('s-script').value = scriptUrl || '';
+  document.getElementById('modal-settings').classList.add('open');
+}
+
+async function saveSettings() {
+  const name = document.getElementById('s-name').value.trim();
+  if (!name) { showToast('اكتب اسمك أولاً'); return; }
+  const url = document.getElementById('s-script').value.trim();
+  currentUser = name;
+  scriptUrl = url;
+  localStorage.setItem('kbaka_user', name);
+  localStorage.setItem('kbaka_script', url);
+  closeM('modal-settings');
+  showToast('✓ تم حفظ الإعدادات');
+  setSyncState(url ? 'syncing' : 'local');
+  if (url) await initStorage();
+}
+
+function confirmResetApp() {
+  showConfirm('🗑️', 'مسح البيانات', 'هيتم مسح كل البيانات المحلية. البيانات على Google Sheet مش هتتأثر.', () => {
+    localStorage.removeItem('kbaka_data');
+    S = { people: [], transactions: [] };
+    closeM('modal-settings');
+    render();
+    showToast('✓ تم مسح البيانات المحلية');
+  });
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function bal(pid) {
+  const p = S.people.find(x => x.id === pid); if (!p) return 0;
+  let b = 0;
+  S.transactions.filter(t => t.pid === pid).forEach(t => {
+    if (p.type === 'client') {
+      if (t.type === 'debt') b += t.amount;
+      else if (t.type === 'payment' || t.type === 'credit') b -= t.amount;
+    } else {
+      if (t.type === 'credit') b += t.amount;
+      else if (t.type === 'payment' || t.type === 'debt') b -= t.amount;
+    }
+  });
+  return b;
+}
+
+function recalculateRems(pid) {
+  const nonPayments = S.transactions
+    .filter(t => t.pid === pid && t.type !== 'payment')
+    .sort((a, b) => a.date - b.date);
+  // Reset all rems
+  nonPayments.forEach(t => { t.rem = t.amount; });
+  // Re-apply payments chronologically
+  S.transactions
+    .filter(t => t.pid === pid && t.type === 'payment')
+    .sort((a, b) => a.date - b.date)
+    .forEach(payment => {
+      let left = payment.amount;
+      nonPayments.forEach(debt => {
+        if (left <= 0) return;
+        const cv = Math.min(debt.rem, left);
+        debt.rem -= cv;
+        left -= cv;
+      });
+    });
+}
+
+function fmt(n) { return Math.abs(n).toLocaleString('ar-EG', { minimumFractionDigits: n % 1 === 0 ? 0 : 2, maximumFractionDigits: 2 }) + ' ج'; }
+function fdate(ts) { return new Date(ts).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+function uid() { return 'k' + Math.random().toString(36).slice(2, 10); }
+function initials(name) { return (name || '').split(' ').slice(0, 2).map(w => w[0] || '').join(''); }
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() { renderSummary(); renderList(); updateCounts(); }
+
+function updateCounts() {
+  document.getElementById('c-cnt').textContent = '(' + S.people.filter(p => p.type === 'client').length + ')';
+  document.getElementById('s-cnt').textContent = '(' + S.people.filter(p => p.type === 'supplier').length + ')';
+}
+
+function switchTab(t) {
+  currentTab = t; searchQ = ''; document.getElementById('search-inp').value = '';
+  document.getElementById('tab-clients').className = 'tab' + (t === 'clients' ? ' active' : '');
+  document.getElementById('tab-suppliers').className = 'tab' + (t === 'suppliers' ? ' active' : '');
+  render();
+}
+
+function renderSummary() {
+  const type = currentTab === 'clients' ? 'client' : 'supplier';
+  const people = S.people.filter(p => p.type === type);
+  let total = 0; people.forEach(p => { const b = bal(p.id); if (b > 0) total += b; });
+  const isC = type === 'client';
+  document.getElementById('summary-bar').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-lbl">${isC ? 'إجمالي ديون العملاء' : 'إجمالي المستحق للموردين'}</div>
+      <div class="stat-val r">${fmt(total)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">${isC ? 'عدد العملاء' : 'عدد الموردين'}</div>
+      <div class="stat-val">${people.length}</div>
+    </div>`;
+}
+
+function filterList(q) { searchQ = q; renderList(); }
+
+function renderList() {
+  const type = currentTab === 'clients' ? 'client' : 'supplier';
+  let people = S.people.filter(p => p.type === type);
+  if (searchQ) people = people.filter(p => p.name.includes(searchQ));
+  const c = document.getElementById('list-container');
+  if (!people.length) {
+    c.innerHTML = `<div class="empty"><div class="empty-ico">${type === 'client' ? '👥' : '🏪'}</div><div class="empty-txt">لا يوجد ${type === 'client' ? 'عملاء' : 'موردين'} بعد</div><div class="empty-sub">اضغط + لإضافة شخص جديد</div></div>`;
+    return;
+  }
+  people.sort((a, b) => bal(b.id) - bal(a.id));
+  c.innerHTML = people.map(p => {
+    const b = bal(p.id);
+    const txC = S.transactions.filter(t => t.pid === p.id).length;
+    let pillClass = 'pill-n', pillTxt = 'مسوّى ✓';
+    if (b > 0) { pillClass = 'pill-r'; pillTxt = '+' + fmt(b); }
+    else if (b < 0) { pillClass = 'pill-g'; pillTxt = fmt(b); }
+    return `<div class="person-card" onclick="openDetail('${p.id}')">
+      <div class="card-top"></div>
+      <div class="p-row">
+        <div class="avatar ${p.type}">${initials(p.name)}</div>
+        <div class="p-info">
+          <div class="p-name">${p.name}</div>
+          <div class="p-meta">${txC} معاملة${p.phone ? ' · ' + p.phone : ''}${p.note ? ' · ' + p.note : ''}</div>
+        </div>
+        <div class="pill ${pillClass}">${pillTxt}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// DETAIL
+// ============================================================
+function openDetail(pid) {
+  currentPersonId = pid;
+  const p = S.people.find(x => x.id === pid); if (!p) return;
+  document.getElementById('view-list').style.display = 'none';
+  document.getElementById('view-detail').style.display = 'block';
+  document.getElementById('main-fab').style.display = 'none';
+  document.getElementById('d-name').textContent = p.name;
+  document.getElementById('d-type').textContent = p.type === 'client' ? '👤 عميل' : '🏪 مورد';
+  renderDetail(p);
+}
+
+function renderDetail(p) {
+  const b = bal(p.id);
+  const el = document.getElementById('bh-amt');
+  const lbl = document.getElementById('bh-lbl');
+  el.textContent = fmt(b);
+  if (b === 0) { el.className = 'bh-amt n'; lbl.textContent = 'الحساب مسوّى ✓'; }
+  else if (p.type === 'client') {
+    el.className = 'bh-amt ' + (b > 0 ? 'r' : 'g');
+    lbl.textContent = b > 0 ? 'مديونية العميل للمحل' : 'المحل مدين للعميل';
+  } else {
+    el.className = 'bh-amt ' + (b > 0 ? 'r' : 'g');
+    lbl.textContent = b > 0 ? 'المستحق للمورد' : 'المورد مدين للمحل';
+  }
+  const txs = S.transactions.filter(t => t.pid === p.id).sort((a, b) => b.date - a.date);
+  document.getElementById('tx-cnt-lbl').textContent = txs.length + ' معاملة';
+  const list = document.getElementById('tx-list');
+  if (!txs.length) {
+    list.innerHTML = `<div class="empty" style="padding:28px 0"><div class="empty-sub">لا توجد معاملات بعد<br>اضغط "تسجيل معاملة جديدة"</div></div>`;
+    return;
+  }
+  list.innerHTML = txs.map(tx => {
+    let ico, icoClass, amtClass, sign;
+    if (tx.type === 'debt')         { ico = '📝'; icoClass = 'debt';    amtClass = 'r'; sign = '+'; }
+    else if (tx.type === 'credit')  { ico = '📦'; icoClass = 'credit';  amtClass = 'r'; sign = '+'; }
+    else                            { ico = '💰'; icoClass = 'payment'; amtClass = 'g'; sign = '-'; }
+    const remTag = tx.rem > 0 && tx.type !== 'payment'
+      ? `<span class="tx-rem">متبقي: ${fmt(tx.rem)}</span>` : '';
+    return `<div class="tx-item">
+      <div class="tx-ico ${icoClass}">${ico}</div>
+      <div class="tx-body">
+        <div class="tx-desc">${tx.desc}</div>
+        <div class="tx-date">${fdate(tx.date)}</div>
+        <div class="tx-user">👤 ${tx.user}</div>
+        ${remTag}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+        <div class="tx-amt ${amtClass}">${sign}${fmt(tx.amount)}</div>
+        <div class="tx-action-btns">
+          <button class="tx-action-btn" onclick="event.stopPropagation();openEditTxModal('${tx.id}')">✏️ تعديل</button>
+          <button class="tx-action-btn" onclick="event.stopPropagation();confirmDeleteTx('${tx.id}')">🗑 حذف</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function backToList() {
+  currentPersonId = null;
+  document.getElementById('view-list').style.display = 'block';
+  document.getElementById('view-detail').style.display = 'none';
+  document.getElementById('main-fab').style.display = 'flex';
+  render();
+}
+
+// ============================================================
+// PERSON MODAL (ADD / EDIT)
+// ============================================================
+function openPersonModal() {
+  editingPersonId = null;
+  document.getElementById('person-modal-title').textContent = 'إضافة شخص جديد';
+  document.getElementById('person-save-btn').textContent = '✓ حفظ';
+  document.getElementById('person-type-toggle').style.display = 'grid';
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-phone').value = '';
+  document.getElementById('p-note').value = '';
+  setPersonType(currentTab === 'clients' ? 'client' : 'supplier');
+  document.getElementById('modal-person').classList.add('open');
+  setTimeout(() => document.getElementById('p-name').focus(), 150);
+}
+
+function openEditPersonModal() {
+  const p = S.people.find(x => x.id === currentPersonId); if (!p) return;
+  editingPersonId = p.id;
+  document.getElementById('person-modal-title').textContent = 'تعديل بيانات ' + p.name;
+  document.getElementById('person-save-btn').textContent = '✓ حفظ التعديلات';
+  document.getElementById('person-type-toggle').style.display = 'none';
+  document.getElementById('p-name').value = p.name;
+  document.getElementById('p-phone').value = p.phone || '';
+  document.getElementById('p-note').value = p.note || '';
+  document.getElementById('modal-person').classList.add('open');
+  setTimeout(() => document.getElementById('p-name').focus(), 150);
+}
+
+function setPersonType(t) {
+  pType = t;
+  document.getElementById('ptype-client').className = 'type-btn' + (t === 'client' ? ' sc' : '');
+  document.getElementById('ptype-supplier').className = 'type-btn' + (t === 'supplier' ? ' ss' : '');
+}
+
+async function savePerson() {
+  const name = document.getElementById('p-name').value.trim();
+  if (!name) { showToast('اكتب الاسم أولاً'); return; }
+  if (editingPersonId) {
+    const p = S.people.find(x => x.id === editingPersonId);
+    if (p) { p.name = name; p.phone = document.getElementById('p-phone').value.trim(); p.note = document.getElementById('p-note').value.trim(); }
+    await persist(); closeM('modal-person');
+    document.getElementById('d-name').textContent = name;
+    renderDetail(p); showToast('✓ تم تعديل البيانات');
+  } else {
+    const person = { id: uid(), type: pType, name, phone: document.getElementById('p-phone').value.trim(), note: document.getElementById('p-note').value.trim(), ts: Date.now() };
+    S.people.push(person);
+    await persist(); closeM('modal-person'); render(); showToast('✓ تم إضافة ' + name);
+  }
+}
+
+// ============================================================
+// TX MODAL
+// ============================================================
+function openTxModal() {
+  const p = S.people.find(x => x.id === currentPersonId); if (!p) return;
+  document.getElementById('tx-amount').value = '';
+  document.getElementById('tx-desc').value = '';
+  document.getElementById('tx-modal-title').textContent = 'معاملة — ' + p.name;
+  const grid = document.getElementById('tx-type-grid');
+  if (p.type === 'client') {
+    txType = 'debt';
+    grid.innerHTML = `
+      <button class="tx-btn sd" id="txb-debt" onclick="setTxType('debt')">📝 مديونية<br><span style="font-size:10px;font-weight:500">اشترى بالشك</span></button>
+      <button class="tx-btn" id="txb-pay" onclick="setTxType('payment')">💰 دفعة<br><span style="font-size:10px;font-weight:500">العميل دفع</span></button>
+      <button class="tx-btn" id="txb-credit" onclick="setTxType('credit')">↩ رد بضاعة<br><span style="font-size:10px;font-weight:500">بضاعة رجعت</span></button>`;
+  } else {
+    txType = 'credit';
+    grid.innerHTML = `
+      <button class="tx-btn sc2" id="txb-credit" onclick="setTxType('credit')">📦 فاتورة<br><span style="font-size:10px;font-weight:500">استلمنا بضاعة</span></button>
+      <button class="tx-btn" id="txb-pay" onclick="setTxType('payment')">💰 دفعنا<br><span style="font-size:10px;font-weight:500">دفعنا للمورد</span></button>
+      <button class="tx-btn" id="txb-debt" onclick="setTxType('debt')">↩ مرتجع<br><span style="font-size:10px;font-weight:500">رجعنا بضاعة</span></button>`;
+  }
+  document.getElementById('modal-tx').classList.add('open');
+  setTimeout(() => document.getElementById('tx-amount').focus(), 150);
+}
+
+function setTxType(t) {
+  txType = t;
+  const map = { debt: 'sd', pay: 'sp', credit: 'sc2' };
+  ['debt', 'pay', 'credit'].forEach(x => {
+    const el = document.getElementById('txb-' + x); if (!el) return;
+    el.className = 'tx-btn' + (x === t ? ' ' + map[x] : '');
+  });
+}
+
+async function saveTx() {
+  const amount = parseFloat(document.getElementById('tx-amount').value);
+  if (!amount || amount <= 0) { showToast('اكتب مبلغ صحيح'); return; }
+  const desc = document.getElementById('tx-desc').value.trim();
+  const p = S.people.find(x => x.id === currentPersonId); if (!p) return;
+  let rem = amount;
+  if (txType === 'payment') {
+    const opens = S.transactions.filter(t => t.pid === currentPersonId && t.rem > 0 && t.type !== 'payment').sort((a, b) => a.date - b.date);
+    let left = amount;
+    opens.forEach(t => { if (left <= 0) return; const cv = Math.min(t.rem, left); t.rem -= cv; left -= cv; });
+    rem = 0;
+  }
+  const defDesc = txType === 'debt' ? 'مديونية' : txType === 'credit' ? (p.type === 'client' ? 'رد بضاعة' : 'فاتورة مورد') : 'دفعة';
+  S.transactions.push({ id: uid(), pid: currentPersonId, type: txType, amount, desc: desc || defDesc, date: Date.now(), user: currentUser, rem });
+  await persist(); closeM('modal-tx');
+  renderDetail(p);
+  const nb = bal(currentPersonId);
+  showToast(txType === 'payment' ? `✓ دفعة ${fmt(amount)} — المتبقي: ${fmt(nb)}` : '✓ تم التسجيل بنجاح');
+}
+
+// ============================================================
+// EDIT TX (NEW)
+// ============================================================
+function openEditTxModal(txId) {
+  const tx = S.transactions.find(t => t.id === txId);
+  if (!tx) return;
+  editingTxId = txId;
+  document.getElementById('edit-tx-amount').value = tx.amount;
+  document.getElementById('edit-tx-desc').value = tx.desc || '';
+  const typeMap = { debt: '📝 مديونية', credit: '📦 فاتورة / رد بضاعة', payment: '💰 دفعة' };
+  document.getElementById('edit-tx-title').textContent = 'تعديل — ' + (typeMap[tx.type] || tx.type);
+  document.getElementById('edit-tx-type-badge').innerHTML =
+    `<span style="background:var(--bg);border:1px solid var(--border);padding:6px 12px;border-radius:20px;font-size:13px;font-weight:700;color:var(--txt2)">${typeMap[tx.type] || tx.type} · ${fdate(tx.date)}</span>`;
+  document.getElementById('modal-edit-tx').classList.add('open');
+  setTimeout(() => { const el = document.getElementById('edit-tx-amount'); el.focus(); el.select(); }, 150);
+}
+
+async function saveEditTx() {
+  const amount = parseFloat(document.getElementById('edit-tx-amount').value);
+  if (!amount || amount <= 0) { showToast('اكتب مبلغ صحيح'); return; }
+  const desc = document.getElementById('edit-tx-desc').value.trim();
+  const tx = S.transactions.find(t => t.id === editingTxId);
+  if (!tx) return;
+  tx.amount = amount;
+  if (desc) tx.desc = desc;
+  // Recalculate all rems for this person from scratch
+  recalculateRems(tx.pid);
+  await persist();
+  closeM('modal-edit-tx');
+  const p = S.people.find(x => x.id === tx.pid);
+  if (p) renderDetail(p);
+  render();
+  showToast('✓ تم تعديل المعاملة وإعادة حساب الأرصدة');
+}
+
+// ============================================================
+// DELETE
+// ============================================================
+function confirmDeletePerson() {
+  const p = S.people.find(x => x.id === currentPersonId); if (!p) return;
+  const txCount = S.transactions.filter(t => t.pid === currentPersonId).length;
+  showConfirm('🗑️', 'حذف ' + p.name, `سيتم حذف الشخص و${txCount} معاملة بشكل نهائي. مش هيرجع تاني.`, async () => {
+    S.people = S.people.filter(x => x.id !== currentPersonId);
+    S.transactions = S.transactions.filter(t => t.pid !== currentPersonId);
+    await persist(); backToList(); showToast('✓ تم الحذف');
+  });
+}
+
+function confirmDeleteTx(txId) {
+  showConfirm('🗑️', 'حذف المعاملة', 'هتحذف المعاملة دي نهائياً؟', async () => {
+    const tx = S.transactions.find(t => t.id === txId);
+    const pid = tx ? tx.pid : currentPersonId;
+    S.transactions = S.transactions.filter(t => t.id !== txId);
+    recalculateRems(pid);
+    await persist();
+    const p = S.people.find(x => x.id === currentPersonId);
+    if (p) renderDetail(p);
+    showToast('✓ تم حذف المعاملة');
+  });
+}
+
+// ============================================================
+// CONFIRM DIALOG
+// ============================================================
+function showConfirm(icon, title, msg, cb) {
+  document.getElementById('confirm-icon').textContent = icon;
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent = msg;
+  confirmCallback = cb;
+  document.getElementById('confirm-ok').onclick = async () => { closeConfirm(); if (confirmCallback) await confirmCallback(); };
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('open'); }
+
+// ============================================================
+// UTILS
+// ============================================================
+function maybeClose(id, e) { if (e.target === document.getElementById(id)) closeM(id); }
+function closeM(id) { document.getElementById(id).classList.remove('open'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
